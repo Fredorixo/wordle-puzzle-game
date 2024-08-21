@@ -1,21 +1,16 @@
 import "package:flutter/material.dart";
+import "package:wordle/constants/outcome.dart";
 import "package:wordle/text_field_tile.dart";
 
 class TextFieldRow extends StatefulWidget {
   final int k;
-  final String word;
-  final Map<String, int> map = {};
+  final List<Outcome> Function(String) onSubmit;
 
-  TextFieldRow({
+  const TextFieldRow({
     Key? key,
     required this.k,
-    required this.word,
-  })  : assert(word.length == k),
-        super(key: key) {
-    for (int i = 0; i < k; ++i) {
-      map[word[i]] = map.containsKey(word[i]) ? map[word[i]]! + 1 : 1;
-    }
-  }
+    required this.onSubmit,
+  }) : super(key: key);
 
   @override
   State<TextFieldRow> createState() => _TextFieldRowState();
@@ -23,6 +18,7 @@ class TextFieldRow extends StatefulWidget {
 
 class _TextFieldRowState extends State<TextFieldRow> {
   bool isReadOnly = false;
+  Color textColor = Colors.black;
   late List<Color> colors;
   late final List<FocusNode> focusNodes;
   late final List<TextEditingController> controllers;
@@ -45,46 +41,32 @@ class _TextFieldRowState extends State<TextFieldRow> {
     super.dispose();
   }
 
-  void decreaseCount(final String ch, final Map<String, int> count) {
-    count[ch] = count[ch]! - 1;
+  void evaluate() {
+    String guess = "";
 
-    if (count[ch] == 0) {
-      count.remove(ch);
+    for (final TextEditingController controller in controllers) {
+      guess = guess + controller.text;
     }
-  }
 
-  void validate() {
-    final Map<String, int> count = {};
+    List<Outcome> outcomes = widget.onSubmit(guess);
+
     final List<Color> updatedColors = List.filled(widget.k, Colors.grey);
 
-    widget.map.forEach((key, value) {
-      count[key] = value;
-    });
-
     for (int i = 0; i < widget.k; ++i) {
-      if (controllers[i].text == widget.word[i]) {
-        // Match with correct position
-        updatedColors[i] = Colors.green;
-        decreaseCount(controllers[i].text, count);
-      } else if (count.containsKey(controllers[i].text)) {
-        // Match but not correct position
-        updatedColors[i] = Colors.yellow;
-        decreaseCount(controllers[i].text, count);
+      if (outcomes[i] == Outcome.correct) {
+        updatedColors[i] = Colors.lightGreen.shade600;
+      } else if (outcomes[i] == Outcome.partiallyCorrect) {
+        updatedColors[i] = Colors.yellow.shade700;
       } else {
-        // No match
         updatedColors[i] = Colors.grey;
       }
     }
 
     setState(() {
       colors = updatedColors;
+      textColor = Colors.white;
       isReadOnly = true;
     });
-  }
-
-  void showError() {
-    // Implement using an alert system
-    // print("The word is too small.");
   }
 
   FocusNode onTap() {
@@ -106,13 +88,14 @@ class _TextFieldRowState extends State<TextFieldRow> {
           TextFieldTile(
             onTap: onTap,
             fillColor: colors[i],
+            textColor: textColor,
             focusNode: focusNodes[i],
             isReadOnly: isReadOnly,
             controller: controllers[i],
             backController: i > 0 ? controllers[i - 1] : null,
             backward: i > 0 ? focusNodes[i - 1] : null,
             forward: i + 1 < widget.k ? focusNodes[i + 1] : null,
-            onSubmit: i == widget.k - 1 ? validate : showError,
+            onSubmit: evaluate,
           ),
       ],
     );

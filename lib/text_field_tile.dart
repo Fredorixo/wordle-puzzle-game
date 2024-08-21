@@ -15,8 +15,9 @@ class UpperCaseTextFormatter extends TextInputFormatter {
 }
 
 class TextFieldTile extends StatelessWidget {
-  bool isReadOnly;
+  final bool isReadOnly;
   final Color fillColor;
+  final Color textColor;
   final FocusNode? forward;
   final FocusNode? backward;
   final FocusNode focusNode;
@@ -25,7 +26,7 @@ class TextFieldTile extends StatelessWidget {
   final TextEditingController controller;
   final TextEditingController? backController;
 
-  TextFieldTile({
+  const TextFieldTile({
     Key? key,
     this.backController,
     this.forward,
@@ -36,19 +37,20 @@ class TextFieldTile extends StatelessWidget {
     required this.focusNode,
     required this.isReadOnly,
     required this.fillColor,
+    required this.textColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      margin: const EdgeInsets.only(right: 5.0),
+      margin: const EdgeInsets.all(2.5),
       padding: const EdgeInsets.only(bottom: 5.0),
       decoration: BoxDecoration(
         color: fillColor,
         border: Border.all(
           color: Colors.grey.shade300,
-          width: 3.0,
+          width: 1.5,
         ),
         borderRadius: BorderRadius.circular(5.0),
       ),
@@ -70,8 +72,9 @@ class TextFieldTile extends StatelessWidget {
           readOnly: isReadOnly,
           controller: controller,
           focusNode: focusNode,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
+            color: textColor,
             fontSize: 20.0,
           ),
           decoration: const InputDecoration(

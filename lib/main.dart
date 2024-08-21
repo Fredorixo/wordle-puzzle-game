@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:wordle/text_field_row.dart";
+import "package:wordle/text_field_grid.dart";
 
 void main() => runApp(const MyApp());
 
@@ -16,9 +16,8 @@ class MyApp extends StatelessWidget {
           title: const Text("Welcome To Wordle"),
           centerTitle: true,
         ),
-        body: TextFieldRow(
-          k: 6,
-          word: "MOBILE",
+        body: SingleChildScrollView(
+          child: TextFieldGrid(),
         ),
       ),
       debugShowCheckedModeBanner: false,
