@@ -22,7 +22,7 @@ class TextFieldTile extends StatelessWidget {
   final FocusNode? backward;
   final FocusNode focusNode;
   final void Function() onSubmit;
-  final FocusNode Function() onTap;
+  final FocusNode? Function() onTap;
   final TextEditingController controller;
   final TextEditingController? backController;
 
@@ -43,9 +43,6 @@ class TextFieldTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: Alignment.center,
-      margin: const EdgeInsets.all(2.5),
-      padding: const EdgeInsets.only(bottom: 5.0),
       decoration: BoxDecoration(
         color: fillColor,
         border: Border.all(
@@ -54,8 +51,6 @@ class TextFieldTile extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(5.0),
       ),
-      width: 48.0,
-      height: 48.0,
       child: KeyboardListener(
         focusNode: FocusNode(),
         onKeyEvent: (event) {
@@ -92,8 +87,8 @@ class TextFieldTile extends StatelessWidget {
           },
           onSubmitted: (_) => onSubmit(),
           onTap: () {
-            FocusNode curr = onTap();
-            curr.requestFocus();
+            FocusNode? curr = onTap();
+            curr?.requestFocus();
           },
         ),
       ),

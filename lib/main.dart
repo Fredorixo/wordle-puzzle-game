@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:wordle/constants/difficulty.dart";
 import "package:wordle/text_field_grid.dart";
 
 void main() => runApp(const MyApp());
@@ -13,11 +14,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.blue),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text("Welcome To Wordle"),
+          title: const Text("Let's Play Wordle!"),
           centerTitle: true,
         ),
-        body: SingleChildScrollView(
-          child: TextFieldGrid(),
+        body: TextFieldGrid(
+          word: "MOBILE",
+          difficulty: Difficulty.medium,
         ),
       ),
       debugShowCheckedModeBanner: false,
