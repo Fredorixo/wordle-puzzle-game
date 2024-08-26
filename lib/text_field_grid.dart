@@ -6,7 +6,14 @@ import "package:wordle/text_field_tile.dart";
 class TextFieldGrid extends StatefulWidget {
   final String word;
   final Difficulty difficulty;
+
   final Map<String, int> map = {};
+  late final int tries;
+  late final List<List<FocusNode>> nodes;
+  late final List<List<Color>> fillColors;
+  late final List<bool> isReadOnly;
+  late final List<List<TextEditingController>> controllers;
+  late final List<Color> textColors;
 
   TextFieldGrid({
     Key? key,
@@ -16,29 +23,13 @@ class TextFieldGrid extends StatefulWidget {
     for (int i = 0; i < word.length; ++i) {
       map[word[i]] = map.containsKey(word[i]) ? map[word[i]]! + 1 : 1;
     }
-  }
 
-  @override
-  State<TextFieldGrid> createState() => _TextFieldGridState();
-}
-
-class _TextFieldGridState extends State<TextFieldGrid> {
-  late final int tries;
-  late final List<List<FocusNode>> nodes;
-  late List<List<Color>> fillColors;
-  late final List<bool> isReadOnly;
-  late final List<List<TextEditingController>> controllers;
-  late final List<Color> textColors;
-
-  @override
-  void initState() {
-    super.initState();
-    tries = attempts[widget.difficulty]!;
+    tries = attempts[difficulty]!;
 
     controllers = List.generate(
       tries,
       (_) => List.generate(
-        widget.word.length,
+        word.length,
         (_) => TextEditingController(),
         growable: false,
       ),
@@ -48,7 +39,7 @@ class _TextFieldGridState extends State<TextFieldGrid> {
     nodes = List.generate(
       tries,
       (_) => List.generate(
-        widget.word.length,
+        word.length,
         (_) => FocusNode(),
         growable: false,
       ),
@@ -58,7 +49,7 @@ class _TextFieldGridState extends State<TextFieldGrid> {
     fillColors = List.generate(
       tries,
       (_) => List.filled(
-        widget.word.length,
+        word.length,
         Colors.white70,
       ),
       growable: false,
@@ -69,11 +60,16 @@ class _TextFieldGridState extends State<TextFieldGrid> {
   }
 
   @override
+  State<TextFieldGrid> createState() => _TextFieldGridState();
+}
+
+class _TextFieldGridState extends State<TextFieldGrid> {
+  @override
   void dispose() {
-    for (int i = 0; i < tries; ++i) {
+    for (int i = 0; i < widget.tries; ++i) {
       for (int j = 0; j < widget.word.length; ++j) {
-        controllers[i][j].dispose();
-        nodes[i][j].dispose();
+        widget.controllers[i][j].dispose();
+        widget.nodes[i][j].dispose();
       }
     }
 
@@ -121,22 +117,24 @@ class _TextFieldGridState extends State<TextFieldGrid> {
   void onSubmit(int row) {
     String guess = "";
 
-    for (final TextEditingController controller in controllers[row]) {
+    for (final TextEditingController controller in widget.controllers[row]) {
       guess = guess + controller.text;
     }
 
     // Alert the user if the guess is too short
     if (guess.length < widget.word.length) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text("Word is Too Short"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, "OK"),
-              child: const Text("OK"),
-            )
-          ],
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            "Word is Too Short",
+            style: TextStyle(
+              fontSize: 20.0,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          duration: const Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.blue.shade600,
         ),
       );
 
@@ -144,36 +142,34 @@ class _TextFieldGridState extends State<TextFieldGrid> {
     }
 
     List<Outcome> outcomes = validate(guess);
-    List<List<Color>> updatedColors = fillColors;
-
-    for (int j = 0; j < widget.word.length; ++j) {
-      if (outcomes[j] == Outcome.correct) {
-        updatedColors[row][j] = Colors.lightGreen.shade600;
-      } else if (outcomes[j] == Outcome.partiallyCorrect) {
-        updatedColors[row][j] = Colors.yellow.shade700;
-      } else {
-        updatedColors[row][j] = Colors.grey;
-      }
-    }
 
     setState(() {
-      fillColors = updatedColors;
-      textColors[row] = Colors.white;
-      isReadOnly[row] = true;
+      for (int j = 0; j < widget.word.length; ++j) {
+        if (outcomes[j] == Outcome.correct) {
+          widget.fillColors[row][j] = Colors.lightGreen.shade600;
+        } else if (outcomes[j] == Outcome.partiallyCorrect) {
+          widget.fillColors[row][j] = Colors.yellow.shade700;
+        } else {
+          widget.fillColors[row][j] = Colors.grey;
+        }
+      }
+
+      widget.textColors[row] = Colors.white;
+      widget.isReadOnly[row] = true;
     });
   }
 
   // Search the intended position for editing
   FocusNode? searchEditingPosition() {
-    for (int i = 0; i < tries; ++i) {
-      if (isReadOnly[i] == false) {
+    for (int i = 0; i < widget.tries; ++i) {
+      if (widget.isReadOnly[i] == false) {
         for (int j = 0; j < widget.word.length; ++j) {
-          if (controllers[i][j].text.isEmpty) {
-            return nodes[i][j];
+          if (widget.controllers[i][j].text.isEmpty) {
+            return widget.nodes[i][j];
           }
         }
 
-        return nodes[i].last;
+        return widget.nodes[i].last;
       }
     }
 
@@ -188,19 +184,20 @@ class _TextFieldGridState extends State<TextFieldGrid> {
       mainAxisSpacing: 5.0,
       crossAxisCount: widget.word.length,
       children: [
-        for (int i = 0; i < tries; ++i)
+        for (int i = 0; i < widget.tries; ++i)
           for (int j = 0; j < widget.word.length; ++j)
             TextFieldTile(
               onSubmit: () => onSubmit(i),
               onTap: searchEditingPosition,
-              controller: controllers[i][j],
-              focusNode: nodes[i][j],
-              backward: j > 0 ? nodes[i][j - 1] : null,
-              forward: j + 1 < widget.word.length ? nodes[i][j + 1] : null,
-              backController: j > 0 ? controllers[i][j - 1] : null,
-              isReadOnly: isReadOnly[i],
-              fillColor: fillColors[i][j],
-              textColor: textColors[i],
+              controller: widget.controllers[i][j],
+              focusNode: widget.nodes[i][j],
+              backward: j > 0 ? widget.nodes[i][j - 1] : null,
+              forward:
+                  j + 1 < widget.word.length ? widget.nodes[i][j + 1] : null,
+              backController: j > 0 ? widget.controllers[i][j - 1] : null,
+              isReadOnly: widget.isReadOnly[i],
+              fillColor: widget.fillColors[i][j],
+              textColor: widget.textColors[i],
             )
       ],
     );
