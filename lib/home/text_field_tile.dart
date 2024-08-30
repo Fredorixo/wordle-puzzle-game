@@ -16,6 +16,7 @@ class UpperCaseTextFormatter extends TextInputFormatter {
 
 class TextFieldTile extends StatelessWidget {
   final bool isReadOnly;
+  final bool isEnabled;
   final Color fillColor;
   final Color textColor;
   final FocusNode? forward;
@@ -36,6 +37,7 @@ class TextFieldTile extends StatelessWidget {
     required this.controller,
     required this.focusNode,
     required this.isReadOnly,
+    required this.isEnabled,
     required this.fillColor,
     required this.textColor,
   }) : super(key: key);
@@ -66,6 +68,7 @@ class TextFieldTile extends StatelessWidget {
           textAlign: TextAlign.center,
           enableInteractiveSelection: false,
           readOnly: isReadOnly,
+          enabled: isEnabled,
           controller: controller,
           focusNode: focusNode,
           style: TextStyle(

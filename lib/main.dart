@@ -1,4 +1,4 @@
 import "package:flutter/material.dart";
-import "package:wordle/wordle_app.dart";
+import "package:wordle/app/app.dart";
 
 void main() => runApp(const WordleApp());
