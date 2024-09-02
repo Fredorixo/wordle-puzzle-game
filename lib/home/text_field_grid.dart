@@ -1,11 +1,15 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:wordle/app/color_schemes.dart";
+import "package:wordle/app/dimensions.dart";
 import "package:wordle/backend/game.dart";
 import "package:wordle/backend/riddle_word.dart";
 import "package:wordle/constants/difficulty.dart";
 import "package:wordle/constants/game_state.dart";
 import "package:wordle/constants/outcome.dart";
 import "package:wordle/home/text_field_tile.dart";
+import "package:wordle/reveal/loser_reveal_dialog.dart";
+import "package:wordle/reveal/winner_reveal_dialog.dart";
 
 class TextFieldGrid extends StatefulWidget {
   final int letters;
@@ -27,11 +31,11 @@ class TextFieldGrid extends StatefulWidget {
 }
 
 class _TextFieldGridState extends State<TextFieldGrid> {
+  late List<bool> _isReadOnly;
+  late List<Color> _textColors;
   late List<List<FocusNode>> _nodes;
   late List<List<Color>> _fillColors;
-  late List<bool> _isReadOnly;
   late List<List<TextEditingController>> _controllers;
-  late List<Color> _textColors;
 
   @override
   void initState() {
@@ -125,6 +129,23 @@ class _TextFieldGridState extends State<TextFieldGrid> {
     }
   }
 
+  // Flash a reveal dialog on the screen
+  void showWinnerRevealDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => const WinnerRevealDialog(),
+    );
+  }
+
+  void showLoserRevealDialog(String word) {
+    showDialog(
+      context: context,
+      builder: (_) => LoserRevealDialog(
+        result: word,
+      ),
+    );
+  }
+
   void decreaseCount(final String ch, final Map<String, int> count) {
     count[ch] = count[ch]! - 1;
 
@@ -203,24 +224,24 @@ class _TextFieldGridState extends State<TextFieldGrid> {
       }
     }
 
-    // If the guess was correct
     if (isCorrect) {
+      // If the guess was correct
       context.read<GameCubit>().changeGameState(GameState.win);
-    }
-
-    // If this was the last unsuccessful attempt
-    if (row == widget.tries - 1) {
+      showWinnerRevealDialog();
+    } else if (row == widget.tries - 1) {
+      // If this was the last unsuccessful attempt
       context.read<GameCubit>().changeGameState(GameState.complete);
+      showLoserRevealDialog(context.read<RiddleWordCubit>().state.word!);
     }
 
     setState(() {
       for (int j = 0; j < widget.letters; ++j) {
         if (outcomes[j] == Outcome.correct) {
-          _fillColors[row][j] = Colors.lightGreen.shade600;
+          _fillColors[row][j] = ColorSchemes.correctColor;
         } else if (outcomes[j] == Outcome.partiallyCorrect) {
-          _fillColors[row][j] = Colors.yellow.shade700;
+          _fillColors[row][j] = ColorSchemes.partiallyCorrectColor;
         } else {
-          _fillColors[row][j] = Colors.grey;
+          _fillColors[row][j] = ColorSchemes.incorrectColor;
         }
       }
 
@@ -248,28 +269,42 @@ class _TextFieldGridState extends State<TextFieldGrid> {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      padding: const EdgeInsets.all(20.0),
-      crossAxisSpacing: 5.0,
-      mainAxisSpacing: 5.0,
-      crossAxisCount: widget.letters,
-      children: [
-        for (int i = 0; i < widget.tries; ++i)
-          for (int j = 0; j < widget.letters; ++j)
-            TextFieldTile(
-              onSubmit: () => onSubmit(i),
-              onTap: searchEditingPosition,
-              isEnabled: widget.isEnabled,
-              controller: _controllers[i][j],
-              focusNode: _nodes[i][j],
-              backward: j > 0 ? _nodes[i][j - 1] : null,
-              forward: j + 1 < widget.letters ? _nodes[i][j + 1] : null,
-              backController: j > 0 ? _controllers[i][j - 1] : null,
-              isReadOnly: _isReadOnly[i],
-              fillColor: _fillColors[i][j],
-              textColor: _textColors[i],
-            )
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 15.0,
+        left: 15.0,
+        right: 15.0,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: widget.letters * Dimensions.tileSideLength +
+                (widget.letters - 1) * Dimensions.tileGap,
+          ),
+          child: GridView.count(
+            crossAxisSpacing: 5.0,
+            mainAxisSpacing: 5.0,
+            crossAxisCount: widget.letters,
+            children: [
+              for (int i = 0; i < widget.tries; ++i)
+                for (int j = 0; j < widget.letters; ++j)
+                  TextFieldTile(
+                    onSubmit: () => onSubmit(i),
+                    onTap: searchEditingPosition,
+                    isEnabled: widget.isEnabled,
+                    controller: _controllers[i][j],
+                    focusNode: _nodes[i][j],
+                    backward: j > 0 ? _nodes[i][j - 1] : null,
+                    forward: j + 1 < widget.letters ? _nodes[i][j + 1] : null,
+                    backController: j > 0 ? _controllers[i][j - 1] : null,
+                    isReadOnly: _isReadOnly[i],
+                    fillColor: _fillColors[i][j],
+                    textColor: _textColors[i],
+                  )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

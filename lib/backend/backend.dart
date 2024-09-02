@@ -1,5 +1,5 @@
 class Backend {
-  Future<RiddleWord> getWord() {
+  Future<RiddleWord> getRiddleWord() {
     return Future.value(
       RiddleWord(
         word: "DREAMS",

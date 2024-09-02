@@ -5,7 +5,9 @@ import "package:wordle/backend/game.dart";
 import "package:wordle/backend/riddle_word.dart";
 import "package:wordle/constants/difficulty.dart";
 import "package:wordle/constants/game_state.dart";
+import "package:wordle/footer_buttons/instructions.dart";
 import "package:wordle/footer_buttons/settings.dart";
+import "package:wordle/home/loading_animation.dart";
 import "package:wordle/home/text_field_grid.dart";
 
 class HomeScreen extends StatefulWidget {
@@ -17,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _letters = 3;
+  bool _hasLoadingAnimation = false;
   Difficulty _difficulty = Difficulty.easy;
 
   void updateLetterCount(int letters) {
@@ -62,15 +65,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? null
                     : () async {
                         // Initiate the loading animation
+                        setState(() {
+                          _hasLoadingAnimation = true;
+                        });
 
                         // Get the riddle-word from the backend
                         final RiddleWord _riddleWord =
-                            await context.read<Backend>().getWord();
+                            await context.read<Backend>().getRiddleWord();
 
                         // Update the riddle-word
-                        context.read<RiddleWordCubit>().updateWord(_riddleWord);
+                        context
+                            .read<RiddleWordCubit>()
+                            .updateRiddleWord(_riddleWord);
 
                         // Conclude the loading animation
+                        await Future.delayed(const Duration(seconds: 1), () {
+                          setState(() {
+                            _hasLoadingAnimation = false;
+                          });
+                        });
 
                         context
                             .read<GameCubit>()
@@ -83,10 +96,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           body: SafeArea(
-            child: TextFieldGrid(
-              letters: _letters,
-              difficulty: _difficulty,
-              isEnabled: gameState == GameState.playing,
+            child: Stack(
+              alignment: AlignmentDirectional.center,
+              children: [
+                TextFieldGrid(
+                  letters: _letters,
+                  difficulty: _difficulty,
+                  isEnabled: gameState == GameState.playing,
+                ),
+                if (_hasLoadingAnimation) const LoadingAnimation(),
+              ],
             ),
           ),
           persistentFooterButtons: [
@@ -102,15 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   tooltip: "Leaderboard",
                 ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.help_rounded,
-                    color: Colors.grey.shade700,
-                    semanticLabel: "Guide",
-                  ),
-                  tooltip: "Guide",
-                ),
+                const Instructions(),
                 IconButton(
                   onPressed: () {},
                   icon: Icon(

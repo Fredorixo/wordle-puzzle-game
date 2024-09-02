@@ -6,7 +6,7 @@ class RiddleWordCubit extends Cubit<RiddleWord> {
 
   final Map<String, int> map = {};
 
-  void updateWord(RiddleWord riddleWord) {
+  void updateRiddleWord(RiddleWord riddleWord) {
     map.clear();
 
     riddleWord.word?.split("").forEach((ch) {

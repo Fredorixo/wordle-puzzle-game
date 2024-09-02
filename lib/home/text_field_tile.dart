@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
+import "package:wordle/app/dimensions.dart";
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -74,7 +75,7 @@ class TextFieldTile extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: textColor,
-            fontSize: 20.0,
+            fontSize: Dimensions.tileFontSize,
           ),
           decoration: const InputDecoration(
             border: InputBorder.none,
