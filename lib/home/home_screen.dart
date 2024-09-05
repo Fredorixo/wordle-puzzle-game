@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:wordle/animations/confetti_animation.dart";
 import "package:wordle/backend/backend.dart";
 import "package:wordle/backend/game.dart";
 import "package:wordle/backend/riddle_word.dart";
@@ -7,7 +8,7 @@ import "package:wordle/constants/difficulty.dart";
 import "package:wordle/constants/game_state.dart";
 import "package:wordle/footer_buttons/instructions.dart";
 import "package:wordle/footer_buttons/settings.dart";
-import "package:wordle/home/loading_animation.dart";
+import "package:wordle/animations/loading_animation.dart";
 import "package:wordle/home/text_field_grid.dart";
 
 class HomeScreen extends StatefulWidget {
@@ -70,16 +71,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         });
 
                         // Get the riddle-word from the backend
-                        final RiddleWord _riddleWord =
-                            await context.read<Backend>().getRiddleWord();
+                        final RiddleWord _riddleWord = await context
+                            .read<Backend>()
+                            .getRiddleWord(_letters);
 
                         // Update the riddle-word
                         context
                             .read<RiddleWordCubit>()
                             .updateRiddleWord(_riddleWord);
 
-                        // Conclude the loading animation
-                        await Future.delayed(const Duration(seconds: 1), () {
+                        // Conclude the loading and initiate the start animation
+                        await Future.delayed(const Duration(seconds: 4), () {
                           setState(() {
                             _hasLoadingAnimation = false;
                           });
@@ -92,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icon(
                   icons[gameState],
                 ),
-              )
+              ),
             ],
           ),
           body: SafeArea(
@@ -105,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   isEnabled: gameState == GameState.playing,
                 ),
                 if (_hasLoadingAnimation) const LoadingAnimation(),
+                if (gameState == GameState.win) const ConfettiAnimation()
               ],
             ),
           ),

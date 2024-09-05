@@ -1,13 +1,15 @@
+import "package:flip_card/flip_card_controller.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:wordle/app/color_schemes.dart";
 import "package:wordle/app/dimensions.dart";
+import "package:wordle/app/time_duration.dart";
 import "package:wordle/backend/game.dart";
 import "package:wordle/backend/riddle_word.dart";
 import "package:wordle/constants/difficulty.dart";
 import "package:wordle/constants/game_state.dart";
 import "package:wordle/constants/outcome.dart";
-import "package:wordle/home/text_field_tile.dart";
+import "package:wordle/home/flip_card_tile.dart";
 import "package:wordle/reveal/loser_reveal_dialog.dart";
 import "package:wordle/reveal/winner_reveal_dialog.dart";
 
@@ -31,11 +33,12 @@ class TextFieldGrid extends StatefulWidget {
 }
 
 class _TextFieldGridState extends State<TextFieldGrid> {
-  late List<bool> _isReadOnly;
-  late List<Color> _textColors;
+  late List<List<bool>> _isReadOnly;
+  late List<List<Color>> _textColors;
   late List<List<FocusNode>> _nodes;
   late List<List<Color>> _fillColors;
   late List<List<TextEditingController>> _controllers;
+  late List<List<FlipCardController>> _flipControllers;
 
   @override
   void initState() {
@@ -46,6 +49,16 @@ class _TextFieldGridState extends State<TextFieldGrid> {
       (_) => List.generate(
         widget.letters,
         (_) => TextEditingController(),
+        growable: false,
+      ),
+      growable: false,
+    );
+
+    _flipControllers = List.generate(
+      widget.tries,
+      (_) => List.generate(
+        widget.letters,
+        (_) => FlipCardController(),
         growable: false,
       ),
       growable: false,
@@ -65,13 +78,28 @@ class _TextFieldGridState extends State<TextFieldGrid> {
       widget.tries,
       (_) => List.filled(
         widget.letters,
-        Colors.white70,
+        Colors.transparent,
       ),
       growable: false,
     );
 
-    _isReadOnly = List.filled(widget.tries, false);
-    _textColors = List.filled(widget.tries, Colors.black);
+    _isReadOnly = List.generate(
+      widget.tries,
+      (_) => List.filled(
+        widget.letters,
+        false,
+      ),
+      growable: false,
+    );
+
+    _textColors = List.generate(
+      widget.tries,
+      (_) => List.filled(
+        widget.letters,
+        Colors.black,
+      ),
+      growable: false,
+    );
   }
 
   @override
@@ -105,6 +133,16 @@ class _TextFieldGridState extends State<TextFieldGrid> {
         growable: false,
       );
 
+      _flipControllers = List.generate(
+        widget.tries,
+        (_) => List.generate(
+          widget.letters,
+          (_) => FlipCardController(),
+          growable: false,
+        ),
+        growable: false,
+      );
+
       _nodes = List.generate(
         widget.tries,
         (_) => List.generate(
@@ -119,21 +157,41 @@ class _TextFieldGridState extends State<TextFieldGrid> {
         widget.tries,
         (_) => List.filled(
           widget.letters,
-          Colors.white70,
+          Colors.transparent,
         ),
         growable: false,
       );
 
-      _isReadOnly = List.filled(widget.tries, false);
-      _textColors = List.filled(widget.tries, Colors.black);
+      _isReadOnly = List.generate(
+        widget.tries,
+        (_) => List.filled(
+          widget.letters,
+          false,
+        ),
+        growable: false,
+      );
+
+      _textColors = List.generate(
+        widget.tries,
+        (_) => List.filled(
+          widget.letters,
+          Colors.black,
+        ),
+        growable: false,
+      );
     }
   }
 
-  // Flash a reveal dialog on the screen
+  // Flash a reveal dialog after confetti animation on the screen
   void showWinnerRevealDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => const WinnerRevealDialog(),
+    Future.delayed(
+      Duration(milliseconds: 1000 + TimeDuration.confettiAnimationTime),
+      () {
+        showDialog(
+          context: context,
+          builder: (_) => const WinnerRevealDialog(),
+        );
+      },
     );
   }
 
@@ -224,36 +282,52 @@ class _TextFieldGridState extends State<TextFieldGrid> {
       }
     }
 
-    if (isCorrect) {
-      // If the guess was correct
-      context.read<GameCubit>().changeGameState(GameState.win);
-      showWinnerRevealDialog();
-    } else if (row == widget.tries - 1) {
-      // If this was the last unsuccessful attempt
-      context.read<GameCubit>().changeGameState(GameState.complete);
-      showLoserRevealDialog(context.read<RiddleWordCubit>().state.word!);
+    // Animating the letter tiles
+    for (int j = 0; j < widget.letters; ++j) {
+      Future.delayed(
+        Duration(milliseconds: (j + 1) * TimeDuration.tileAnimationTime),
+        () async {
+          await _flipControllers[row][j].toggleCard();
+
+          setState(() {
+            if (outcomes[j] == Outcome.correct) {
+              _fillColors[row][j] = ColorSchemes.correctColor;
+            } else if (outcomes[j] == Outcome.partiallyCorrect) {
+              _fillColors[row][j] = ColorSchemes.partiallyCorrectColor;
+            } else {
+              _fillColors[row][j] = ColorSchemes.incorrectColor;
+            }
+
+            _textColors[row][j] = Colors.white;
+            _isReadOnly[row][j] = true;
+          });
+        },
+      );
     }
 
-    setState(() {
-      for (int j = 0; j < widget.letters; ++j) {
-        if (outcomes[j] == Outcome.correct) {
-          _fillColors[row][j] = ColorSchemes.correctColor;
-        } else if (outcomes[j] == Outcome.partiallyCorrect) {
-          _fillColors[row][j] = ColorSchemes.partiallyCorrectColor;
-        } else {
-          _fillColors[row][j] = ColorSchemes.incorrectColor;
+    // Executing the post-animation logic
+    Future.delayed(
+      Duration(
+        milliseconds: widget.letters * TimeDuration.tileAnimationTime + 1500,
+      ),
+      () {
+        if (isCorrect) {
+          // If the guess was correct
+          context.read<GameCubit>().changeGameState(GameState.win);
+          showWinnerRevealDialog();
+        } else if (row == widget.tries - 1) {
+          // If this was the last unsuccessful attempt
+          context.read<GameCubit>().changeGameState(GameState.complete);
+          showLoserRevealDialog(context.read<RiddleWordCubit>().state.word!);
         }
-      }
-
-      _textColors[row] = Colors.white;
-      _isReadOnly[row] = true;
-    });
+      },
+    );
   }
 
   // Search the intended position for editing
   FocusNode? searchEditingPosition() {
     for (int i = 0; i < widget.tries; ++i) {
-      if (_isReadOnly[i] == false) {
+      if (_isReadOnly[i][0] == false) {
         for (int j = 0; j < widget.letters; ++j) {
           if (_controllers[i][j].text.isEmpty) {
             return _nodes[i][j];
@@ -288,18 +362,19 @@ class _TextFieldGridState extends State<TextFieldGrid> {
             children: [
               for (int i = 0; i < widget.tries; ++i)
                 for (int j = 0; j < widget.letters; ++j)
-                  TextFieldTile(
+                  FlipCardTile(
                     onSubmit: () => onSubmit(i),
                     onTap: searchEditingPosition,
                     isEnabled: widget.isEnabled,
                     controller: _controllers[i][j],
+                    flipController: _flipControllers[i][j],
                     focusNode: _nodes[i][j],
                     backward: j > 0 ? _nodes[i][j - 1] : null,
                     forward: j + 1 < widget.letters ? _nodes[i][j + 1] : null,
                     backController: j > 0 ? _controllers[i][j - 1] : null,
-                    isReadOnly: _isReadOnly[i],
+                    isReadOnly: _isReadOnly[i][j],
                     fillColor: _fillColors[i][j],
-                    textColor: _textColors[i],
+                    textColor: _textColors[i][j],
                   )
             ],
           ),

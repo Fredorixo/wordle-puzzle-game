@@ -1,5 +1,5 @@
 class Backend {
-  Future<RiddleWord> getRiddleWord() {
+  Future<RiddleWord> getRiddleWord(int letters) async {
     return Future.value(
       RiddleWord(
         word: "DREAMS",
@@ -17,4 +17,11 @@ class RiddleWord {
     this.word,
     this.riddle,
   });
+
+  factory RiddleWord.fromJson(Map<String, String> json) {
+    return RiddleWord(
+      word: json["word"],
+      riddle: json["riddle"],
+    );
+  }
 }

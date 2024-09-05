@@ -5,4 +5,6 @@ abstract class ColorSchemes {
   static Color partiallyCorrectColor = Colors.yellow.shade700;
   static Color incorrectColor = Colors.grey;
   static Color headlineColor = Colors.blue.shade100;
+
+  // tileTextColor dependent on theme
 }
