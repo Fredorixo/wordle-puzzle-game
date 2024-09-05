@@ -1,17 +1,18 @@
 import "package:flutter/material.dart";
-import "package:wordle/app/color_schemes.dart";
 import "package:wordle/custom_widgets/icon_title.dart";
 
 class RevealDialog extends StatelessWidget {
+  final Color color;
   final String title;
-  final String message;
   final IconData icon;
+  final String message;
 
   const RevealDialog({
     Key? key,
-    required this.title,
-    required this.message,
     required this.icon,
+    required this.title,
+    required this.color,
+    required this.message,
   }) : super(key: key);
 
   @override
@@ -21,10 +22,10 @@ class RevealDialog extends StatelessWidget {
       title: Container(
         padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 12.0),
         decoration: BoxDecoration(
-          color: ColorSchemes.headlineColor,
+          color: color,
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(5.0),
-            topRight: Radius.circular(5.0),
+            topLeft: Radius.circular(4.0),
+            topRight: Radius.circular(4.0),
           ),
         ),
         child: IconTitle(

@@ -1,7 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:wordle/animations/confetti_animation.dart";
-import "package:wordle/backend/backend.dart";
 import "package:wordle/backend/game.dart";
 import "package:wordle/backend/riddle_word.dart";
 import "package:wordle/constants/difficulty.dart";
@@ -9,6 +8,7 @@ import "package:wordle/constants/game_state.dart";
 import "package:wordle/footer_buttons/instructions.dart";
 import "package:wordle/footer_buttons/settings.dart";
 import "package:wordle/animations/loading_animation.dart";
+import "package:wordle/home/action_button.dart";
 import "package:wordle/home/text_field_grid.dart";
 
 class HomeScreen extends StatefulWidget {
@@ -37,12 +37,17 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Map<GameState, IconData> icons = {
-    GameState.begin: Icons.play_circle_outline_rounded,
-    GameState.playing: Icons.play_disabled_rounded,
-    GameState.complete: Icons.replay_circle_filled_rounded,
-    GameState.win: Icons.replay_circle_filled_rounded,
-  };
+  void startLoading() {
+    setState(() {
+      _hasLoadingAnimation = true;
+    });
+  }
+
+  void stopLoading() {
+    setState(() {
+      _hasLoadingAnimation = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,43 +62,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? ""
                     : context.read<RiddleWordCubit>().state.riddle,
                 preferBelow: true,
+                triggerMode: TooltipTriggerMode.tap,
+                padding: const EdgeInsets.all(7.5),
+                margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                showDuration: const Duration(seconds: 15),
                 child: const Icon(
                   Icons.info_outline_rounded,
                 ),
               ),
-              IconButton(
-                onPressed: gameState == GameState.playing
-                    ? null
-                    : () async {
-                        // Initiate the loading animation
-                        setState(() {
-                          _hasLoadingAnimation = true;
-                        });
-
-                        // Get the riddle-word from the backend
-                        final RiddleWord _riddleWord = await context
-                            .read<Backend>()
-                            .getRiddleWord(_letters);
-
-                        // Update the riddle-word
-                        context
-                            .read<RiddleWordCubit>()
-                            .updateRiddleWord(_riddleWord);
-
-                        // Conclude the loading and initiate the start animation
-                        await Future.delayed(const Duration(seconds: 4), () {
-                          setState(() {
-                            _hasLoadingAnimation = false;
-                          });
-                        });
-
-                        context
-                            .read<GameCubit>()
-                            .changeGameState(GameState.playing);
-                      },
-                icon: Icon(
-                  icons[gameState],
-                ),
+              ActionButton(
+                gameState: gameState,
+                letters: _letters,
+                startLoading: startLoading,
+                stopLoading: stopLoading,
               ),
             ],
           ),

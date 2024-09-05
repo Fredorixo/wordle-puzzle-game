@@ -29,6 +29,7 @@ dependencies:
   provider: ^6.1.2
   lottie: ^1.4.2
   flip_card: ^0.7.0
+  http: ^0.13.5
 
 dev_dependencies:
   flutter_test:

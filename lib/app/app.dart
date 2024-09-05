@@ -22,6 +22,7 @@ class WordleApp extends StatelessWidget {
         ],
         child: Provider(
           create: (_) => Backend(),
+          dispose: (_, Backend backend) => backend.client.close(),
           child: const HomeScreen(),
         ),
       ),

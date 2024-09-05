@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:wordle/app/color_schemes.dart";
 import "package:wordle/reveal/reveal_dialog.dart";
 
 class WinnerRevealDialog extends StatelessWidget {
@@ -6,10 +7,11 @@ class WinnerRevealDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const RevealDialog(
+    return RevealDialog(
       title: "Congratulations",
       message: "You were able to successfully guess the word.",
       icon: Icons.celebration_rounded,
+      color: ColorSchemes.headlineColor,
     );
   }
 }

@@ -26,7 +26,10 @@ class IconTitle extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 5.0),
-        Icon(icon),
+        Icon(
+          icon,
+          color: Colors.black,
+        ),
       ],
     );
   }

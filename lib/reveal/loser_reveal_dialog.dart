@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:wordle/app/color_schemes.dart";
 import "package:wordle/reveal/reveal_dialog.dart";
 
 class LoserRevealDialog extends StatelessWidget {
@@ -13,8 +14,9 @@ class LoserRevealDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return RevealDialog(
       title: "Game Over",
-      message: "The answer was ''$result''",
+      message: "The answer was ''$result''.",
       icon: Icons.rocket_launch_rounded,
+      color: ColorSchemes.headlineColor,
     );
   }
 }
