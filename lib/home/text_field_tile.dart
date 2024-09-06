@@ -19,7 +19,7 @@ class TextFieldTile extends StatelessWidget {
   final bool isReadOnly;
   final bool isEnabled;
   final Color fillColor;
-  final Color textColor;
+  final Color? textColor;
   final FocusNode? forward;
   final FocusNode? backward;
   final FocusNode focusNode;
@@ -33,6 +33,7 @@ class TextFieldTile extends StatelessWidget {
     this.backController,
     this.forward,
     this.backward,
+    this.textColor,
     required this.onSubmit,
     required this.onTap,
     required this.controller,
@@ -40,7 +41,6 @@ class TextFieldTile extends StatelessWidget {
     required this.isReadOnly,
     required this.isEnabled,
     required this.fillColor,
-    required this.textColor,
   }) : super(key: key);
 
   @override
@@ -50,7 +50,7 @@ class TextFieldTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: fillColor,
         border: Border.all(
-          color: Colors.grey.shade300,
+          color: Colors.grey.shade400,
           width: 1.5,
         ),
         borderRadius: BorderRadius.circular(5.0),

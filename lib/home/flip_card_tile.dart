@@ -7,7 +7,7 @@ class FlipCardTile extends StatelessWidget {
   final bool isReadOnly;
   final bool isEnabled;
   final Color fillColor;
-  final Color textColor;
+  final Color? textColor;
   final FocusNode? forward;
   final FocusNode? backward;
   final FocusNode focusNode;
@@ -30,7 +30,7 @@ class FlipCardTile extends StatelessWidget {
     required this.isReadOnly,
     required this.isEnabled,
     required this.fillColor,
-    required this.textColor,
+    this.textColor,
     required this.flipController,
   }) : super(key: key) {
     _textFieldTile = TextFieldTile(

@@ -12,7 +12,14 @@ import "package:wordle/home/action_button.dart";
 import "package:wordle/home/text_field_grid.dart";
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final void Function() changeTheme;
+  final bool hasLightTheme;
+
+  const HomeScreen({
+    Key? key,
+    required this.changeTheme,
+    required this.hasLightTheme,
+  }) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -55,7 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, gameState) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text("Let's Play Wordle!"),
+            title: const Text("Wordle Puzzle Game"),
+            elevation: 1.0,
             actions: [
               Tooltip(
                 message: gameState == GameState.begin
@@ -97,20 +105,23 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 IconButton(
-                  onPressed: () {},
-                  icon: Icon(
+                  onPressed: _hasLoadingAnimation ? null : () {},
+                  icon: const Icon(
                     Icons.leaderboard_rounded,
-                    color: Colors.grey.shade700,
                     semanticLabel: "Leaderboard",
                   ),
                   tooltip: "Leaderboard",
                 ),
-                const Instructions(),
+                Instructions(
+                  isDiabled: _hasLoadingAnimation,
+                ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed:
+                      _hasLoadingAnimation ? null : () => widget.changeTheme(),
                   icon: Icon(
-                    Icons.dark_mode_rounded,
-                    color: Colors.grey.shade700,
+                    widget.hasLightTheme
+                        ? Icons.dark_mode_rounded
+                        : Icons.light_mode_rounded,
                     semanticLabel: "Toggle Brightness",
                   ),
                   tooltip: "Toggle Brightness",
@@ -118,6 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Settings(
                   letters: _letters,
                   difficulty: _difficulty,
+                  isDisabled: _hasLoadingAnimation,
                   updateDifficulty: updateDifficulty,
                   updateLetterCount: updateLetterCount,
                 ),

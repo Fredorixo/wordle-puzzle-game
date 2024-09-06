@@ -5,7 +5,12 @@ import "package:wordle/footer_buttons/footer_bottom_sheet.dart";
 import "package:wordle/footer_buttons/instruction_tile.dart";
 
 class Instructions extends StatelessWidget {
-  const Instructions({Key? key}) : super(key: key);
+  final bool isDiabled;
+
+  const Instructions({
+    Key? key,
+    required this.isDiabled,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +24,7 @@ class Instructions extends StatelessWidget {
           ),
           textAlign: TextAlign.justify,
         ),
+        const SizedBox(height: 10.0),
         const Divider(),
         InstructionTile(
           color: ColorSchemes.correctColor,
@@ -33,6 +39,7 @@ class Instructions extends StatelessWidget {
           message: "Letter isn't in the word",
         ),
       ],
+      isDisabled: isDiabled,
       titleIcon: Icons.library_books_rounded,
       displayIcon: Icons.help_rounded,
     );

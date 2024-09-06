@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:wordle/app/dimensions.dart";
 
 class IconTitle extends StatelessWidget {
   final String title;
@@ -17,19 +16,17 @@ class IconTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: mainAxisAlignment,
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           title,
-          style: TextStyle(
-            fontSize: Dimensions.bottomSheetTitleFontSize,
+          style: const TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(width: 5.0),
-        Icon(
-          icon,
-          color: Colors.black,
-        ),
+        Icon(icon),
       ],
     );
   }

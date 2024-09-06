@@ -9,7 +9,7 @@ class ErrorRevealDialog extends StatelessWidget {
     return RevealDialog(
       title: "Error",
       message: "An unexpected error occurred, please try again later.",
-      icon: Icons.error_outline_rounded,
+      icon: Icons.error_rounded,
       color: Colors.red.shade400,
     );
   }

@@ -34,7 +34,7 @@ class TextFieldGrid extends StatefulWidget {
 
 class _TextFieldGridState extends State<TextFieldGrid> {
   late List<List<bool>> _isReadOnly;
-  late List<List<Color>> _textColors;
+  late List<List<Color?>> _textColors;
   late List<List<FocusNode>> _nodes;
   late List<List<Color>> _fillColors;
   late List<List<TextEditingController>> _controllers;
@@ -96,7 +96,7 @@ class _TextFieldGridState extends State<TextFieldGrid> {
       widget.tries,
       (_) => List.filled(
         widget.letters,
-        Colors.black,
+        null,
       ),
       growable: false,
     );
@@ -175,7 +175,7 @@ class _TextFieldGridState extends State<TextFieldGrid> {
         widget.tries,
         (_) => List.filled(
           widget.letters,
-          Colors.black,
+          null,
         ),
         growable: false,
       );
@@ -257,15 +257,15 @@ class _TextFieldGridState extends State<TextFieldGrid> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(
-            "Word is Too Short",
+            "Word Is Too Short",
             style: TextStyle(
-              fontSize: 20.0,
+              fontSize: 18.0,
             ),
             textAlign: TextAlign.center,
           ),
-          duration: const Duration(seconds: 1),
+          duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.blue.shade600,
+          backgroundColor: Theme.of(context).primaryColor,
         ),
       );
 
@@ -343,41 +343,38 @@ class _TextFieldGridState extends State<TextFieldGrid> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 15.0,
-        left: 15.0,
-        right: 15.0,
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: widget.letters * Dimensions.tileSideLength +
-                (widget.letters - 1) * Dimensions.tileGap,
-          ),
-          child: GridView.count(
-            crossAxisSpacing: 5.0,
-            mainAxisSpacing: 5.0,
-            crossAxisCount: widget.letters,
-            children: [
-              for (int i = 0; i < widget.tries; ++i)
-                for (int j = 0; j < widget.letters; ++j)
-                  FlipCardTile(
-                    onSubmit: () => onSubmit(i),
-                    onTap: searchEditingPosition,
-                    isEnabled: widget.isEnabled,
-                    controller: _controllers[i][j],
-                    flipController: _flipControllers[i][j],
-                    focusNode: _nodes[i][j],
-                    backward: j > 0 ? _nodes[i][j - 1] : null,
-                    forward: j + 1 < widget.letters ? _nodes[i][j + 1] : null,
-                    backController: j > 0 ? _controllers[i][j - 1] : null,
-                    isReadOnly: _isReadOnly[i][j],
-                    fillColor: _fillColors[i][j],
-                    textColor: _textColors[i][j],
-                  )
-            ],
-          ),
+    return Container(
+      padding: const EdgeInsets.all(15.0),
+      alignment: Alignment.center,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: widget.letters * Dimensions.tileSideLength +
+              (widget.letters - 1) * Dimensions.tileGap,
+          maxHeight: widget.tries * Dimensions.tileSideLength +
+              (widget.tries - 1) * Dimensions.tileGap,
+        ),
+        child: GridView.count(
+          crossAxisSpacing: 5.0,
+          mainAxisSpacing: 5.0,
+          crossAxisCount: widget.letters,
+          children: [
+            for (int i = 0; i < widget.tries; ++i)
+              for (int j = 0; j < widget.letters; ++j)
+                FlipCardTile(
+                  onSubmit: () => onSubmit(i),
+                  onTap: searchEditingPosition,
+                  isEnabled: widget.isEnabled,
+                  controller: _controllers[i][j],
+                  flipController: _flipControllers[i][j],
+                  focusNode: _nodes[i][j],
+                  backward: j > 0 ? _nodes[i][j - 1] : null,
+                  forward: j + 1 < widget.letters ? _nodes[i][j + 1] : null,
+                  backController: j > 0 ? _controllers[i][j - 1] : null,
+                  isReadOnly: _isReadOnly[i][j],
+                  fillColor: _fillColors[i][j],
+                  textColor: _textColors[i][j],
+                )
+          ],
         ),
       ),
     );
