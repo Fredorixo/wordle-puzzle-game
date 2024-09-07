@@ -27,7 +27,7 @@ class _ConfettiAnimationState extends State<ConfettiAnimation>
   @override
   Widget build(BuildContext context) {
     return Lottie.asset(
-      "assets/confetti_animation.json",
+      "assets/animations/confetti_animation.json",
       controller: _controller,
       onLoaded: (composition) {
         _controller

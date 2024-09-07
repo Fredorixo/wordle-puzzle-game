@@ -7,6 +7,7 @@ class AppTheme {
   static ThemeData light() {
     return ThemeData.light().copyWith(
       primaryColor: Colors.deepPurple.shade300,
+      scaffoldBackgroundColor: Colors.grey.shade200,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.grey.shade100,
         titleTextStyle: _textTheme.titleMedium?.copyWith(

@@ -5,7 +5,8 @@ import "package:wordle/app/theme.dart";
 import "package:wordle/backend/backend.dart";
 import "package:wordle/backend/game.dart";
 import "package:wordle/backend/riddle_word.dart";
-import "package:wordle/home/home_screen.dart";
+// import "package:wordle/home/home_screen.dart";
+import "package:wordle/login/login_screen.dart";
 
 class WordleApp extends StatefulWidget {
   const WordleApp({Key? key}) : super(key: key);
@@ -38,10 +39,11 @@ class _WordleAppState extends State<WordleApp> {
         child: Provider(
           create: (_) => Backend(),
           dispose: (_, Backend backend) => backend.client.close(),
-          child: HomeScreen(
-            hasLightTheme: _hasLightTheme,
-            changeTheme: changeTheme,
-          ),
+          // child: HomeScreen(
+          //   hasLightTheme: _hasLightTheme,
+          //   changeTheme: changeTheme,
+          // ),
+          child: const LoginScreen(),
         ),
       ),
       debugShowCheckedModeBanner: false,

@@ -16,7 +16,7 @@ class LoadingAnimation extends StatelessWidget {
             maxWidth: 400.0,
           ),
           child: Lottie.asset(
-            "assets/loading_animation.json",
+            "assets/animations/loading_animation.json",
           ),
         ),
       ),
