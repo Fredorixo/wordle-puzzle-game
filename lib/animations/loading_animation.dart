@@ -6,18 +6,11 @@ class LoadingAnimation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: 0,
-      bottom: 0,
+    return Positioned.fill(
       child: ColoredBox(
         color: Colors.black45,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: 400.0,
-          ),
-          child: Lottie.asset(
-            "assets/animations/loading_animation.json",
-          ),
+        child: Lottie.asset(
+          "assets/animations/loading_animation.json",
         ),
       ),
     );

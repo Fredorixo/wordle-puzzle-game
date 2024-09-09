@@ -9,6 +9,9 @@ class AppTheme {
       primaryColor: Colors.deepPurple.shade300,
       scaffoldBackgroundColor: Colors.grey.shade200,
       appBarTheme: AppBarTheme(
+        iconTheme: IconThemeData(
+          color: Colors.black.withOpacity(0.75),
+        ),
         backgroundColor: Colors.grey.shade100,
         titleTextStyle: _textTheme.titleMedium?.copyWith(
           color: Colors.deepPurple.shade400,

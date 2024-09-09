@@ -4,12 +4,18 @@ class LoginTextField extends StatelessWidget {
   final IconData icon;
   final String hintText;
   final bool obscureText;
+  final bool isDisabled;
+  final TextInputType keyboardType;
+  final TextEditingController controller;
 
   const LoginTextField({
     Key? key,
     required this.icon,
     required this.hintText,
+    required this.isDisabled,
     this.obscureText = false,
+    required this.keyboardType,
+    required this.controller,
   }) : super(key: key);
 
   @override
@@ -21,7 +27,10 @@ class LoginTextField extends StatelessWidget {
         color: Colors.white,
       ),
       child: TextField(
+        enabled: !isDisabled,
+        controller: controller,
         obscureText: obscureText,
+        keyboardType: keyboardType,
         decoration: InputDecoration(
           suffixIcon: Icon(icon),
           border: InputBorder.none,

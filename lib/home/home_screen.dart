@@ -1,3 +1,4 @@
+import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:wordle/animations/confetti_animation.dart";
@@ -6,9 +7,11 @@ import "package:wordle/backend/riddle_word.dart";
 import "package:wordle/constants/difficulty.dart";
 import "package:wordle/constants/game_state.dart";
 import "package:wordle/footer_buttons/instructions.dart";
+import "package:wordle/footer_buttons/leaderboard.dart";
 import "package:wordle/footer_buttons/settings.dart";
 import "package:wordle/animations/loading_animation.dart";
 import "package:wordle/home/action_button.dart";
+import "package:wordle/home/points_flip_counter.dart";
 import "package:wordle/home/text_field_grid.dart";
 
 class HomeScreen extends StatefulWidget {
@@ -62,6 +65,17 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, gameState) {
         return Scaffold(
           appBar: AppBar(
+            leading: IconButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+              },
+              icon: const Icon(
+                Icons.logout_rounded,
+                semanticLabel: "Logout",
+              ),
+              tooltip: "Logout",
+            ),
+            leadingWidth: 35.0,
             title: const Text("Wordle Puzzle Game"),
             elevation: 1.0,
             actions: [
@@ -79,10 +93,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               ActionButton(
-                gameState: gameState,
                 letters: _letters,
-                startLoading: startLoading,
+                gameState: gameState,
                 stopLoading: stopLoading,
+                startLoading: startLoading,
+                isDisabled: _hasLoadingAnimation,
               ),
             ],
           ),
@@ -95,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   difficulty: _difficulty,
                   isEnabled: gameState == GameState.playing,
                 ),
+                const PointsFlipCounter(),
                 if (_hasLoadingAnimation) const LoadingAnimation(),
                 if (gameState == GameState.win) const ConfettiAnimation()
               ],
@@ -104,20 +120,14 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                IconButton(
-                  onPressed: _hasLoadingAnimation ? null : () {},
-                  icon: const Icon(
-                    Icons.leaderboard_rounded,
-                    semanticLabel: "Leaderboard",
-                  ),
-                  tooltip: "Leaderboard",
+                LeaderBoard(
+                  isDisabled: _hasLoadingAnimation,
                 ),
                 Instructions(
                   isDiabled: _hasLoadingAnimation,
                 ),
                 IconButton(
-                  onPressed:
-                      _hasLoadingAnimation ? null : () => widget.changeTheme(),
+                  onPressed: _hasLoadingAnimation ? null : widget.changeTheme,
                   icon: Icon(
                     widget.hasLightTheme
                         ? Icons.dark_mode_rounded

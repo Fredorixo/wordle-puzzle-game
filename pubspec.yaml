@@ -31,6 +31,10 @@ dependencies:
   flip_card: ^0.7.0
   http: ^0.13.5
   google_fonts: ^3.0.1
+  firebase_core: ^1.24.0
+  firebase_auth: ^3.4.0
+  cloud_firestore: ^3.5.1
+  animated_flip_counter: ^0.3.3
 
 dev_dependencies:
   flutter_test:

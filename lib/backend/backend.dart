@@ -1,10 +1,13 @@
 import "dart:io";
 import "dart:convert";
+import "package:cloud_firestore/cloud_firestore.dart";
+import "package:firebase_auth/firebase_auth.dart";
 import "package:http/http.dart" as http;
 
 class Backend {
   final client = http.Client();
 
+  // Get the RiddleWord from AI
   Future<RiddleWord> getRiddleWord(int letters) async {
     final Uri _url = Uri.https(
       "generativelanguage.googleapis.com",
@@ -65,6 +68,51 @@ class Backend {
     final result = jsonDecode(json!) as Map<String, dynamic>;
 
     return RiddleWord.fromJson(result);
+  }
+
+  // Get the progress of a user's points
+  Stream<int> get points {
+    final String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(userId)
+        .snapshots()
+        .map((snapshot) {
+      if (!snapshot.exists) {
+        return 0;
+      }
+
+      return (snapshot.data()!["points"] as num).toInt();
+    });
+  }
+
+  // Update the points for a user
+  Future<void> updatePoints(int value) async {
+    final int currentPoints = await points.first;
+    final int updatedPoints = currentPoints + value;
+
+    final User user = FirebaseAuth.instance.currentUser!;
+
+    await FirebaseFirestore.instance.collection("users").doc(user.uid).set(
+      {
+        "id": user.uid,
+        "name": user.displayName ?? "Anonymous",
+        "points": updatedPoints,
+      },
+    );
+  }
+
+  // Get the top 5 scorers from the database
+  Stream<List<Map<String, dynamic>>> get topScorers {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .orderBy("points")
+        .limit(5)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((document) => document.data()).toList();
+    });
   }
 }
 

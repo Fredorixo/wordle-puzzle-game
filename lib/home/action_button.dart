@@ -7,17 +7,19 @@ import "package:wordle/constants/game_state.dart";
 import "package:wordle/reveal/error_reveal_dialog.dart";
 
 class ActionButton extends StatelessWidget {
-  final GameState gameState;
   final int letters;
-  final void Function() startLoading;
+  final bool isDisabled;
+  final GameState gameState;
   final void Function() stopLoading;
+  final void Function() startLoading;
 
   ActionButton({
     Key? key,
-    required this.gameState,
     required this.letters,
-    required this.startLoading,
+    required this.gameState,
+    required this.isDisabled,
     required this.stopLoading,
+    required this.startLoading,
   }) : super(key: key);
 
   final Map<GameState, IconData> icons = {
@@ -30,7 +32,7 @@ class ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: gameState == GameState.playing
+      onPressed: gameState == GameState.playing || isDisabled
           ? null
           : () async {
               // Initiate the loading animation

@@ -4,6 +4,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 import "package:wordle/app/color_schemes.dart";
 import "package:wordle/app/dimensions.dart";
 import "package:wordle/app/time_duration.dart";
+import "package:wordle/backend/backend.dart";
 import "package:wordle/backend/game.dart";
 import "package:wordle/backend/riddle_word.dart";
 import "package:wordle/constants/difficulty.dart";
@@ -310,9 +311,10 @@ class _TextFieldGridState extends State<TextFieldGrid> {
       Duration(
         milliseconds: widget.letters * TimeDuration.tileAnimationTime + 1500,
       ),
-      () {
+      () async {
         if (isCorrect) {
-          // If the guess was correct
+          // If the guess was correct, update points
+          await context.read<Backend>().updatePoints(6 ~/ widget.tries);
           context.read<GameCubit>().changeGameState(GameState.win);
           showWinnerRevealDialog();
         } else if (row == widget.tries - 1) {
