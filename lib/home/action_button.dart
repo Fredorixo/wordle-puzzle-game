@@ -1,3 +1,5 @@
+import "dart:io";
+
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:wordle/backend/backend.dart";
@@ -52,7 +54,7 @@ class ActionButton extends StatelessWidget {
                 });
 
                 context.read<GameCubit>().changeGameState(GameState.playing);
-              } catch (error) {
+              } on HttpException {
                 // Stop the loading animation immediately
                 stopLoading();
 

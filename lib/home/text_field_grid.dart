@@ -259,13 +259,9 @@ class _TextFieldGridState extends State<TextFieldGrid> {
         SnackBar(
           content: const Text(
             "Word Is Too Short",
-            style: TextStyle(
-              fontSize: 18.0,
-            ),
             textAlign: TextAlign.center,
           ),
           duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
           backgroundColor: Theme.of(context).primaryColor,
         ),
       );

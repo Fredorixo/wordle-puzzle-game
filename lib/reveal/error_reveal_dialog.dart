@@ -10,7 +10,7 @@ class ErrorRevealDialog extends StatelessWidget {
       title: "Error",
       message: "An unexpected error occurred, please try again later.",
       icon: Icons.error_rounded,
-      color: Colors.red.shade400,
+      color: Theme.of(context).errorColor,
     );
   }
 }

@@ -22,6 +22,34 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  void stopLoading() {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  String errorCodeToReadableMessage(String errorCode) {
+    return errorCode
+        .split("-")
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(" ");
+  }
+
+  void showErrorMessage(String errorCode) {
+    String message = errorCodeToReadableMessage(errorCode);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+        ),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Theme.of(context).errorColor,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -119,12 +147,44 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: _isLoading
                         ? null
                         : () async {
+                            String emailId = email.text.trim();
+                            String passwordId = password.text.trim();
+
                             startLoading();
-                            await FirebaseAuth.instance
-                                .signInWithEmailAndPassword(
-                              email: email.text.trim(),
-                              password: password.text.trim(),
-                            );
+
+                            try {
+                              await FirebaseAuth.instance
+                                  .signInWithEmailAndPassword(
+                                email: emailId,
+                                password: passwordId,
+                              );
+                            } on FirebaseAuthException catch (error) {
+                              // If no account is found, create an account
+                              if (error.code == "user-not-found") {
+                                try {
+                                  await FirebaseAuth.instance
+                                      .createUserWithEmailAndPassword(
+                                    email: emailId,
+                                    password: passwordId,
+                                  );
+
+                                  // Sign in after successful account creation
+                                  await FirebaseAuth.instance
+                                      .signInWithEmailAndPassword(
+                                    email: emailId,
+                                    password: passwordId,
+                                  );
+                                } on FirebaseAuthException catch (error) {
+                                  // For weak-passwords
+                                  stopLoading();
+                                  showErrorMessage(error.code);
+                                }
+                              }
+
+                              // For other cases, show errror message
+                              stopLoading();
+                              showErrorMessage(error.code);
+                            }
                           },
                     child: Text(
                       "Sign In",

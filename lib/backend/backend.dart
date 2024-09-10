@@ -97,6 +97,7 @@ class Backend {
     await FirebaseFirestore.instance.collection("users").doc(user.uid).set(
       {
         "id": user.uid,
+        "image": user.photoURL,
         "name": user.displayName ?? "Anonymous",
         "points": updatedPoints,
       },
@@ -107,7 +108,7 @@ class Backend {
   Stream<List<Map<String, dynamic>>> get topScorers {
     return FirebaseFirestore.instance
         .collection("users")
-        .orderBy("points")
+        .orderBy("points", descending: true)
         .limit(5)
         .snapshots()
         .map((snapshot) {

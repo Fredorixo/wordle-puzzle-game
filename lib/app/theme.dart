@@ -25,6 +25,14 @@ class AppTheme {
       iconTheme: IconThemeData(
         color: Colors.black.withOpacity(0.75),
       ),
+      snackBarTheme: const SnackBarThemeData(
+        contentTextStyle: TextStyle(
+          color: Colors.black,
+          fontSize: 18.0,
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+      errorColor: Colors.red.shade400,
       textTheme: _textTheme,
       primaryTextTheme: _textTheme,
     );
@@ -40,6 +48,13 @@ class AppTheme {
           fontWeight: FontWeight.bold,
         ),
       ),
+      snackBarTheme: const SnackBarThemeData(
+        contentTextStyle: TextStyle(
+          fontSize: 18.0,
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+      errorColor: Colors.red.shade400,
       primaryTextTheme: _textTheme.apply(
         bodyColor: Colors.white,
       ),

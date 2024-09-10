@@ -67,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
           appBar: AppBar(
             leading: IconButton(
               onPressed: () async {
+                context.read<GameCubit>().changeGameState(GameState.begin);
                 await FirebaseAuth.instance.signOut();
               },
               icon: const Icon(
