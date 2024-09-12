@@ -35,6 +35,13 @@ dependencies:
   firebase_auth: ^3.4.0
   cloud_firestore: ^3.5.1
   animated_flip_counter: ^0.3.3
+  flutter_spinkit: ^5.2.1
+  google_sign_in: ^5.4.3
+  twitter_login: ^3.0.8
+  flutter_web_auth: ^0.4.3
+
+dependency_overrides:
+  firebase_core_platform_interface: 4.5.1
 
 dev_dependencies:
   flutter_test:

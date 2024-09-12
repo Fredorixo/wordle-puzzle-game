@@ -66,10 +66,14 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           appBar: AppBar(
             leading: IconButton(
-              onPressed: () async {
-                context.read<GameCubit>().changeGameState(GameState.begin);
-                await FirebaseAuth.instance.signOut();
-              },
+              onPressed: _hasLoadingAnimation
+                  ? null
+                  : () async {
+                      context
+                          .read<GameCubit>()
+                          .changeGameState(GameState.begin);
+                      await FirebaseAuth.instance.signOut();
+                    },
               icon: const Icon(
                 Icons.logout_rounded,
                 semanticLabel: "Logout",

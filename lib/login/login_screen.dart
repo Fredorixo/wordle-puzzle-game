@@ -1,5 +1,9 @@
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:provider/provider.dart";
+import "package:wordle/backend/backend.dart";
+import "package:wordle/custom_widgets/loading_indicator.dart";
 import "package:wordle/login/login_button.dart";
 import "package:wordle/login/login_text_field.dart";
 
@@ -11,8 +15,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  late final TextEditingController email;
-  late final TextEditingController password;
+  late final TextEditingController _email;
+  late final TextEditingController _password;
 
   bool _isLoading = false;
 
@@ -53,14 +57,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    email = TextEditingController();
-    password = TextEditingController();
+    _email = TextEditingController();
+    _password = TextEditingController();
   }
 
   @override
   void dispose() {
-    email.dispose();
-    password.dispose();
+    _email.dispose();
+    _password.dispose();
     super.dispose();
   }
 
@@ -100,20 +104,58 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     children: [
                       LoginButton(
-                        onPressed: _isLoading ? null : () {},
-                        assetName: "apple_logo",
-                      ),
-                      LoginButton(
-                        onPressed: _isLoading ? null : () {},
+                        onPressed: _isLoading
+                            ? null
+                            : () async {
+                                startLoading();
+
+                                try {
+                                  await context
+                                      .read<Backend>()
+                                      .signInWithGoogle();
+                                } on FirebaseAuthException catch (error) {
+                                  stopLoading();
+                                  showErrorMessage(error.code);
+                                }
+                              },
                         assetName: "google_logo",
                       ),
                       LoginButton(
-                        onPressed: _isLoading ? null : () {},
+                        onPressed: _isLoading
+                            ? null
+                            : () async {
+                                startLoading();
+
+                                try {
+                                  await context
+                                      .read<Backend>()
+                                      .signInWithTwitter();
+                                } on FirebaseAuthException catch (error) {
+                                  stopLoading();
+                                  showErrorMessage(error.code);
+                                }
+                              },
                         assetName: "twitter_logo",
                       ),
                       LoginButton(
-                        onPressed: _isLoading ? null : () {},
-                        assetName: "facebook_logo",
+                        onPressed: _isLoading
+                            ? null
+                            : () async {
+                                startLoading();
+
+                                try {
+                                  await context
+                                      .read<Backend>()
+                                      .signInWithGithub();
+                                } on PlatformException {
+                                  stopLoading();
+                                  showErrorMessage("sign-in-aborted");
+                                } on FirebaseAuthException catch (error) {
+                                  stopLoading();
+                                  showErrorMessage(error.code);
+                                }
+                              },
+                        assetName: "github_logo",
                       ),
                     ],
                   ),
@@ -129,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   LoginTextField(
                     icon: Icons.email_rounded,
                     hintText: "Email",
-                    controller: email,
+                    controller: _email,
                     isDisabled: _isLoading,
                     keyboardType: TextInputType.emailAddress,
                   ),
@@ -138,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     icon: Icons.password_rounded,
                     hintText: "Password",
                     isDisabled: _isLoading,
-                    controller: password,
+                    controller: _password,
                     obscureText: true,
                     keyboardType: TextInputType.visiblePassword,
                   ),
@@ -147,41 +189,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: _isLoading
                         ? null
                         : () async {
-                            String emailId = email.text.trim();
-                            String passwordId = password.text.trim();
+                            String emailId = _email.text.trim();
+                            String passwordId = _password.text.trim();
 
                             startLoading();
 
                             try {
-                              await FirebaseAuth.instance
+                              await context
+                                  .read<Backend>()
                                   .signInWithEmailAndPassword(
-                                email: emailId,
-                                password: passwordId,
-                              );
+                                    emailId: emailId,
+                                    passwordId: passwordId,
+                                  );
                             } on FirebaseAuthException catch (error) {
-                              // If no account is found, create an account
-                              if (error.code == "user-not-found") {
-                                try {
-                                  await FirebaseAuth.instance
-                                      .createUserWithEmailAndPassword(
-                                    email: emailId,
-                                    password: passwordId,
-                                  );
-
-                                  // Sign in after successful account creation
-                                  await FirebaseAuth.instance
-                                      .signInWithEmailAndPassword(
-                                    email: emailId,
-                                    password: passwordId,
-                                  );
-                                } on FirebaseAuthException catch (error) {
-                                  // For weak-passwords
-                                  stopLoading();
-                                  showErrorMessage(error.code);
-                                }
-                              }
-
-                              // For other cases, show errror message
                               stopLoading();
                               showErrorMessage(error.code);
                             }
@@ -228,13 +248,11 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             if (_isLoading)
-              Positioned.fill(
+              const Positioned.fill(
                 child: ColoredBox(
                   color: Colors.black45,
                   child: Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.deepPurple.shade400,
-                    ),
+                    child: LoadingIndicator(),
                   ),
                 ),
               )

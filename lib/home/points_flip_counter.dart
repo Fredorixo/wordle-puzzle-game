@@ -2,6 +2,7 @@ import "package:animated_flip_counter/animated_flip_counter.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:wordle/backend/backend.dart";
+import "package:wordle/custom_widgets/loading_indicator.dart";
 
 class PointsFlipCounter extends StatelessWidget {
   const PointsFlipCounter({Key? key}) : super(key: key);
@@ -17,9 +18,7 @@ class PointsFlipCounter extends StatelessWidget {
           if (snapshot.hasError) {
             return const Opacity(opacity: 0.0);
           } else if (!snapshot.hasData) {
-            return CircularProgressIndicator(
-              color: Colors.deepPurple.shade400,
-            );
+            return const LoadingIndicator();
           } else {
             return Container(
               padding: const EdgeInsets.symmetric(

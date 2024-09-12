@@ -21,6 +21,7 @@ class LeaderBoardTile extends StatelessWidget {
       padding: const EdgeInsets.only(
         right: 12.5,
         top: 7.5,
+        left: 6.0,
         bottom: 7.5,
       ),
       child: Row(

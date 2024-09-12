@@ -25,16 +25,15 @@ class LoginButton extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: Image.asset(
-                    "assets/images/$assetName.png",
-                    fit: BoxFit.cover,
-                  ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 32.0),
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Image.asset(
+                  "assets/images/$assetName.png",
+                  fit: BoxFit.cover,
                 ),
-              ],
+              ),
             ),
           ),
         ),

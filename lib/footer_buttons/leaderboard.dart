@@ -2,6 +2,7 @@ import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:wordle/backend/backend.dart";
+import "package:wordle/custom_widgets/loading_indicator.dart";
 import "package:wordle/footer_buttons/footer_bottom_sheet.dart";
 import "package:wordle/footer_buttons/leaderboard_tile.dart";
 
@@ -24,9 +25,7 @@ class LeaderBoard extends StatelessWidget {
             if (snapshot.hasError) {
               return const Opacity(opacity: 0.0);
             } else if (!snapshot.hasData) {
-              return CircularProgressIndicator(
-                color: Colors.deepPurple.shade400,
-              );
+              return const LoadingIndicator();
             } else {
               final users = snapshot.data!;
               final currentUserId = FirebaseAuth.instance.currentUser!.uid;
@@ -36,7 +35,7 @@ class LeaderBoard extends StatelessWidget {
                 child: Table(
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   columnWidths: const {
-                    0: FixedColumnWidth(30.0),
+                    0: IntrinsicColumnWidth(),
                     1: FlexColumnWidth(),
                   },
                   children: [

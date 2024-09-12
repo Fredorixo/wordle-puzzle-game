@@ -29,6 +29,7 @@ class AppTheme {
         contentTextStyle: TextStyle(
           color: Colors.black,
           fontSize: 18.0,
+          fontWeight: FontWeight.bold,
         ),
         behavior: SnackBarBehavior.floating,
       ),
@@ -51,6 +52,7 @@ class AppTheme {
       snackBarTheme: const SnackBarThemeData(
         contentTextStyle: TextStyle(
           fontSize: 18.0,
+          fontWeight: FontWeight.bold,
         ),
         behavior: SnackBarBehavior.floating,
       ),

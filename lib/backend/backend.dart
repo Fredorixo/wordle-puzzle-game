@@ -2,7 +2,10 @@ import "dart:io";
 import "dart:convert";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
+import "package:flutter_web_auth/flutter_web_auth.dart";
+import "package:google_sign_in/google_sign_in.dart";
 import "package:http/http.dart" as http;
+import "package:twitter_login/twitter_login.dart";
 
 class Backend {
   final client = http.Client();
@@ -13,10 +16,7 @@ class Backend {
       "generativelanguage.googleapis.com",
       "/v1beta/models/gemini-1.5-flash:generateContent",
       {
-        "key": const String.fromEnvironment(
-          "API_KEY",
-          defaultValue: "API_KEY",
-        ),
+        "key": const String.fromEnvironment("GOOGLE_API_KEY"),
       },
     );
 
@@ -104,16 +104,139 @@ class Backend {
     );
   }
 
-  // Get the top 5 scorers from the database
+  // Get the top 4 scorers from the database
   Stream<List<Map<String, dynamic>>> get topScorers {
     return FirebaseFirestore.instance
         .collection("users")
         .orderBy("points", descending: true)
-        .limit(5)
+        .limit(4)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((document) => document.data()).toList();
     });
+  }
+
+  // Sign in with Email and Password
+  Future<void> signInWithEmailAndPassword({
+    required String emailId,
+    required String passwordId,
+  }) async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailId,
+        password: passwordId,
+      );
+    } on FirebaseAuthException catch (error) {
+      // If no account is found, create an account
+      if (error.code == "user-not-found") {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailId,
+          password: passwordId,
+        );
+
+        // Sign in after successful account creation
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailId,
+          password: passwordId,
+        );
+      }
+
+      // For other cases, show errror message
+      rethrow;
+    }
+  }
+
+  // Sign in with Google
+  Future<void> signInWithGoogle() async {
+    final googleUser = await GoogleSignIn().signIn();
+
+    if (googleUser == null) {
+      throw FirebaseAuthException(code: "sign-in-aborted");
+    }
+
+    final googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      idToken: googleAuth.idToken,
+      accessToken: googleAuth.accessToken,
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  // Sign in with Twitter
+  Future<void> signInWithTwitter() async {
+    final twitterUser = await TwitterLogin(
+      apiKey: const String.fromEnvironment("TWITTER_API_KEY"),
+      apiSecretKey: const String.fromEnvironment("TWITTER_API_KEY_SECRET"),
+      redirectURI: const String.fromEnvironment("REDIRECT_URI"),
+    ).login();
+
+    if (twitterUser.status == TwitterLoginStatus.cancelledByUser) {
+      throw FirebaseAuthException(code: "sign-in-aborted");
+    }
+
+    if (twitterUser.status == TwitterLoginStatus.error) {
+      throw FirebaseAuthException(code: "sign-in-error");
+    }
+
+    final credential = TwitterAuthProvider.credential(
+      accessToken: twitterUser.authToken!,
+      secret: twitterUser.authTokenSecret!,
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  // Sign in with Github
+  Future<void> signInWithGithub() async {
+    String clientId = const String.fromEnvironment("GITHUB_CLIENT_ID");
+    String clientSecret = const String.fromEnvironment("GITHUB_CLIENT_SECRET");
+    String callbackUrlScheme = const String.fromEnvironment("REDIRECT_URI");
+
+    final url = Uri.https(
+      "github.com",
+      "/login/oauth/authorize",
+      {
+        "client_id": clientId,
+        "redirect_uri": callbackUrlScheme,
+        "scope": "read:user",
+      },
+    );
+
+    // Present the dialog to the user
+    final result = await FlutterWebAuth.authenticate(
+      url: url.toString(),
+      callbackUrlScheme: const String.fromEnvironment("URL_SCHEME"),
+    );
+
+    // Extract code from resulting url
+    final code = Uri.parse(result).queryParameters["code"];
+
+    // Use this code to get an access token
+    final response = await http.post(
+      Uri.parse("https://github.com/login/oauth/access_token"),
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: jsonEncode({
+        "client_id": clientId,
+        "client_secret": clientSecret,
+        "redirect_uri": callbackUrlScheme,
+        "code": code,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw FirebaseAuthException(code: "sign-in-error");
+    }
+
+    // Get the access token from the response
+    final accessToken = jsonDecode(response.body)["access_token"] as String;
+    final credential = GithubAuthProvider.credential(accessToken);
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
   }
 }
 
