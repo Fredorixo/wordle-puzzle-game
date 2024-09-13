@@ -78,6 +78,14 @@ Generate the apk file for the app
   flutter build apk --split-per-abi
 ```
 
+## Screenshots
+
+| *Login Screen* | *Home Screen* | *Selection Screen* |
+| --- | --- | --- |
+| ![login_screen](https://github.com/user-attachments/assets/5172a26e-abb9-41bd-abaa-b13577d2a25d) | ![home_screen](https://github.com/user-attachments/assets/3c2c4b69-c44a-48dd-b258-f1b9c80f7093) | ![selection_screen](https://github.com/user-attachments/assets/1705cacf-b9d1-485d-8af2-5c467b839ff3) |
+| *Riddle Screen* | *Leaderboard Screen* | *Winning Screen* |
+| ![riddle_screen](https://github.com/user-attachments/assets/5092ace8-9793-454c-b045-fbbbc8fcfc06) | ![leaderboard_screen](https://github.com/user-attachments/assets/4f3fd806-d8b1-4192-a9c3-62d1f379a4df) | ![winning_screen](https://github.com/user-attachments/assets/be7b7ab1-62dd-49b9-ac47-0265a6895b33) |
+
 ## Learnings
 
 - State management in Flutter using BLoC(Business Logic Component) and Provider.
