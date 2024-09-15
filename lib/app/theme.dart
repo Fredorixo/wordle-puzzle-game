@@ -33,6 +33,14 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          primary: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+      ),
       errorColor: Colors.red.shade400,
       textTheme: _textTheme,
       primaryTextTheme: _textTheme,
@@ -55,6 +63,14 @@ class AppTheme {
           fontWeight: FontWeight.bold,
         ),
         behavior: SnackBarBehavior.floating,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          primary: Colors.grey[350],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
       ),
       errorColor: Colors.red.shade400,
       primaryTextTheme: _textTheme.apply(

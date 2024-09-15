@@ -219,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
-                      color: Colors.grey[350],
+                      color: Colors.grey.shade400,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

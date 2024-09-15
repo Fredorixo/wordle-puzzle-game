@@ -24,7 +24,7 @@ class LoginTextField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
-        color: Colors.white,
+        color: Colors.white60,
       ),
       child: TextField(
         enabled: !isDisabled,

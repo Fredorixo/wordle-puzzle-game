@@ -99,6 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               ActionButton(
                 letters: _letters,
+                difficulty: _difficulty,
                 gameState: gameState,
                 stopLoading: stopLoading,
                 startLoading: startLoading,

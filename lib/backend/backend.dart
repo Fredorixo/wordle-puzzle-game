@@ -6,12 +6,16 @@ import "package:flutter_web_auth/flutter_web_auth.dart";
 import "package:google_sign_in/google_sign_in.dart";
 import "package:http/http.dart" as http;
 import "package:twitter_login/twitter_login.dart";
+import "package:wordle/constants/difficulty.dart";
 
 class Backend {
   final client = http.Client();
 
   // Get the RiddleWord from AI
-  Future<RiddleWord> getRiddleWord(int letters) async {
+  Future<RiddleWord> getRiddleWord({
+    required int letters,
+    required Difficulty difficulty,
+  }) async {
     final Uri _url = Uri.https(
       "generativelanguage.googleapis.com",
       "/v1beta/models/gemini-1.5-flash:generateContent",
@@ -27,8 +31,9 @@ class Backend {
             "parts": [
               {
                 "text": """
-                  Return a random $letters-letter word and a corresponding riddle
-                  to identify it. Use the following JSON Schema to written the data:
+                  Return a random $letters-letter word with $difficulty difficulty
+                  and a corresponding riddle to identify it.
+                  Use the following JSON Schema to written the data:
                   RiddleWord = {"word": string, "riddle": string}
                   Return RiddleWord.
                 """

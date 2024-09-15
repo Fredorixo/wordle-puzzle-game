@@ -17,12 +17,6 @@ class LoginButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 2.5),
         child: ElevatedButton(
           onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            primary: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-          ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: ConstrainedBox(
