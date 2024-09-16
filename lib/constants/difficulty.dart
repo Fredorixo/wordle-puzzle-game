@@ -9,3 +9,9 @@ Map<Difficulty, int> attempts = {
   Difficulty.medium: 3,
   Difficulty.hard: 1,
 };
+
+Map<Difficulty, String> title = {
+  Difficulty.easy: "easy",
+  Difficulty.medium: "medium",
+  Difficulty.hard: "hard",
+};

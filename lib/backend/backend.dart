@@ -31,7 +31,7 @@ class Backend {
             "parts": [
               {
                 "text": """
-                  Return a random $letters-letter word with $difficulty difficulty
+                  Return a random $letters-letter word with ${title[difficulty]} difficulty
                   and a corresponding riddle to identify it.
                   Use the following JSON Schema to written the data:
                   RiddleWord = {"word": string, "riddle": string}
